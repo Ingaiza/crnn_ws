@@ -12,7 +12,7 @@ import torchaudio.transforms as T
 import torch.nn.functional as F
 import xgboost as xgb
 from ament_index_python.packages import get_package_share_directory
-import itertools # Required for truth table generation
+import itertools 
 
 # --- ALIASING UTILS FOR PICKLE ---
 import sys
@@ -85,31 +85,25 @@ class AudioProcessor(Node):
         original_winner_idx = np.argmax(probs)
         original_winner_class = self.class_map_[original_winner_idx]
         
-        # 1. Generate Truth Table of Multipliers (0.76, 1.24)
-        # Cartesian product of [Low, High] for 3 classes = 8 combinations
+    
         multipliers = [self.WEIGHT_LOW, self.WEIGHT_HIGH]
         combinations = list(itertools.product(multipliers, repeat=3))
         
         wins = 0
         total_scenarios = len(combinations)
 
-        # Debug logs to see the table
-        # self.get_logger().info(f"--- VALIDATION TABLE (Winner: {original_winner_class}) ---")
         
         for i, coeffs in enumerate(combinations):
             # Apply weights: [P_N * w1,  P_U * w2,  P_H * w3]
             weighted_probs = np.array(probs) * np.array(coeffs)
             
-            # Who wins this round?
+            # Round Winner
             round_winner_idx = np.argmax(weighted_probs)
             
             if round_winner_idx == original_winner_idx:
                 wins += 1
             
-            # Optional: Log "close calls" where it fails
-            # else:
-            #    self.get_logger().info(f"   Failed Row {i}: Weights {coeffs} -> Winner {self.class_map_[round_winner_idx]}")
-
+          
         pass_ratio = wins / total_scenarios
         is_valid = wins > (total_scenarios / 2) # Majority (>4 out of 8)
 

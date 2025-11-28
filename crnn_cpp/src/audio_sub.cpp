@@ -84,7 +84,7 @@ private:
         int32_t file_size = 36 + data_chunk_size;
 
         // Header writing (Standard PCM WAV)
-         f.write("RIFF", 4);
+        f.write("RIFF", 4);
         f.write(reinterpret_cast<const char*>(&file_size), 4);
         f.write("WAVE", 4);
         f.write("fmt ", 4);
